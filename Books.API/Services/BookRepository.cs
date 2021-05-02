@@ -17,14 +17,28 @@ namespace Books.API.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        //GetBook - Asynchronous version
         public async Task<Book> GetBookAsync(Guid id)
         {
             return await _context.Books.Include(b => b.Author).Where(b => b.Id == id).FirstOrDefaultAsync();
         }
 
+        //GetBook - Asynchronous version
+        public Book GetBook(Guid id)
+        {
+            return _context.Books.Include(b => b.Author).Where(b => b.Id == id).FirstOrDefault();
+        }
+
+        //GetBooks - Asynchronous version
         public async Task<IEnumerable<Book>> GetBooksAsync()
         {
             return await _context.Books.Include(b => b.Author).ToListAsync();
+        }
+
+        //GetBooks - Synchronous version
+        public IEnumerable<Book> GetBooks()
+        {
+            return _context.Books.Include(b => b.Author).ToList();
         }
 
         public void Dispose()
