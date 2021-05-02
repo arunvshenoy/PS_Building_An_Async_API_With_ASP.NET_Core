@@ -41,6 +41,14 @@ namespace Books.API.Services
             return _context.Books.Include(b => b.Author).ToList();
         }
 
+        //Set of Books
+        public async Task<IEnumerable<Entities.Book>> GetBooksAsync(IEnumerable<Guid> bookIds)
+        {
+            return await _context.Books.Where(b => bookIds.Contains(b.Id))
+                            .Include(b => b.Author).ToListAsync();
+        }
+
+        //To add new book
         public void AddBook(Book book)
         {
             if (book == null)
@@ -51,6 +59,7 @@ namespace Books.API.Services
             _context.Books.Add(book);
         }
 
+        //To Save the context changes
         public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;
