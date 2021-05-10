@@ -28,6 +28,9 @@ namespace Books.API
             services.AddDbContext<BooksContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("BooksDBConnectionString")));
 
+            //To call external API, we need HttpClient instance
+            services.AddHttpClient();
+
             //Register repository services
             services.AddScoped<IBookRepository, BookRepository>();
 

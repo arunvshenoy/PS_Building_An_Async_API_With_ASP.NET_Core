@@ -33,7 +33,10 @@ namespace Books.API.Controllers
 
         [HttpGet]
         [Route("{id}", Name = "GetBook")]
-        [BookResultFilter()] //MVC's Result Filter (keeps the controller code simple)
+        //[BookResultFilter()] //MVC's Result Filter (keeps the controller code simple) - result-filter attribute for Book return type
+        [BookWithCoversResultFilter()]
+        //ActionResult<T> - actual type is inferred from the generic type parameter (ASP.NET Core 2.1 & higher) - Best practice
+        //IActionResult - actual type could no longer be inferred, hence use [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Book))]
         public async Task<IActionResult> GetBook(Guid id)
         {
             var bookEntity = await _bookRepository.GetBookAsync(id);
@@ -42,7 +45,26 @@ namespace Books.API.Controllers
                 return NotFound();
             }
 
-            return Ok(bookEntity);
+            //return Ok(bookEntity); //Old object
+
+            //Single call to external API
+            //var bookCover = await _booksRespository.GetBookCoverAsync("dummycover");
+
+            //Multiple calls to external API
+            var bookCovers = await _bookRepository.GetBookCoversAsync(id);
+
+            ////Old way of writing Property bag or Tuple
+            //var propertyBag = new Tuple<Entities.Book, IEnumerable<ExternalModels.BookCover>>
+            //    (bookEntity, bookCovers);
+            ////propertyBag.Item1 (for bookEntity) & propertyBag.Item2 (for bookCovers)
+
+            ////Property bag or Tuple as Value (Value Tuple structure)
+            //(Entities.Book book, IEnumerable<ExternalModels.BookCover> bookCovers)
+            //    propertyBag = (bookEntity, bookCovers);
+            ////propertyBag.book (for bookEntity) & propertyBag.bookCovers (for bookCovers)
+
+            /////return Ok((book: bookEntity, bookCovers: bookCovers)); //Naming the properties
+            return Ok((bookEntity, bookCovers)); //No need to name the properties
         }
 
         [HttpPost]
